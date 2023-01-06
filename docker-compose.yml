@@ -1,0 +1,32 @@
+version: "3"
+
+networks:
+    bravi-network:
+        driver: bridge
+
+services:
+    app:
+        build: .
+        container_name: bravi-app
+        working_dir: "/var/www/html"
+        networks:
+            - bravi-network
+        volumes:
+            - "./:/var/www/html"
+        ports:
+            - "9002:80"
+
+    database:
+        image: postgres:13.3
+        container_name: bravi-database
+        networks:
+            - bravi-network
+        ports:
+            - "5432:5432"
+        volumes:
+            - "/opt/postgres:/var/lib/postgresql/data"
+        environment:
+            - POSTGRES_USER=pgsql
+            - POSTGRES_PASSWORD=pgsql
+            - POSTGRES_DB=bravi_db
+
