@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePersonRequest;
+use App\Http\Requests\UpdatePersonRequest;
 use App\Models\Person;
 use Illuminate\Http\Request;
 
@@ -23,11 +25,10 @@ class PersonController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePersonRequest $request)
     {
         try {
-            $person = Person::create($request->all());
-            $person->contacts()->createMany($request->contacts);
+            $person = Person::create($request->validated());
             return response('operação realizada com sucesso', 200);
         } catch (\Exception $e) {
             return response('Aconteceu algum erro', 500);
@@ -52,12 +53,10 @@ class PersonController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Person $person)
+    public function update(UpdatePersonRequest $request, Person $person)
     {
         try {
-            $person->update($request->all());
-            $person->contacts()->delete();
-            $person->contacts()->createMany($request->contacts);
+            $person->update($request->validated());
             return response('operação realizada com sucesso', 200);
         } catch (\Exception $e) {
             return response('Aconteceu algum erro', 500);

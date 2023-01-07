@@ -16,10 +16,9 @@ class PersonApiTest extends TestCase
     public function should_show_all_people()
     {
         $person = Person::factory()
-            ->has(Contact::factory()->count(4))
             ->count(10)
             ->create();
-     
+
         $response = $this->getJson(route('person.index'));
         $response->assertSuccessful();
         $response->assertJsonCount(10);
@@ -31,42 +30,34 @@ class PersonApiTest extends TestCase
         $person = Person::factory()
             ->make();
 
-        $contacts = Contact::factory(4)->make();
-
-        $payload = [...$person->toArray(), 'contacts' => [...$contacts->toArray()]];
-
-        $response = $this->postJson(route('person.store'), $payload);
+        $response = $this->postJson(route('person.store'), $person->toArray());
         $response->assertSuccessful();
 
         $this->assertDatabaseHas('people', [
-            'name'  => $person->name
+            'name'      => $person->name,
+            'email'     => $person->email,
+            'whatsapp'  => $person->whatsapp,
+            'phone'     => $person->phone
         ]);
-
-        $this->assertDatabaseCount('contacts', 4);
     }
 
-     /** @test */
-     public function should_show_a_person()
-     {
-         $person = Person::factory()
-             ->has(Contact::factory()->count(4))
-             ->create();
-      
-         $response = $this->getJson(route('person.show', $person));
-         $response->assertSuccessful();
-     }
+    /** @test */
+    public function should_show_a_person()
+    {
+        $person = Person::factory()
+            ->create();
+
+        $response = $this->getJson(route('person.show', $person));
+        $response->assertSuccessful();
+    }
 
     /** @test */
     public function should_update_person()
     {
         $person = Person::factory()
-            ->has(Contact::factory()->count(4))
             ->create();
-
-
-        $contacts2 = Contact::factory(5)->make();
-
-        $payload = ['name' => 'Novo nome', 'contacts' => [...$contacts2->toArray()]];
+        $payload = [ ... $person->toArray()];
+        $payload['name'] = 'Novo nome';
 
         $response = $this->putJson(route('person.update', $person), $payload);
         $response->assertSuccessful();
@@ -74,15 +65,12 @@ class PersonApiTest extends TestCase
         $this->assertDatabaseHas('people', [
             'name'  => 'Novo nome'
         ]);
-
-        $this->assertDatabaseCount('contacts', 5);
     }
 
     /** @test */
     public function should_delete_person()
     {
         $person = Person::factory()
-            ->has(Contact::factory()->count(4))
             ->create();
 
         $response = $this->deleteJson(route('person.destroy', $person));
@@ -91,7 +79,5 @@ class PersonApiTest extends TestCase
         $this->assertDatabaseMissing('people', [
             'name'  => $person->name
         ]);
-
-        $this->assertDatabaseEmpty('contacts');
     }
 }

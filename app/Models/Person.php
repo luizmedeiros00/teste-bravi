@@ -9,10 +9,6 @@ class Person extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'phone', 'email', 'whatsapp'];
 
-    public function contacts()
-    {
-        return $this->hasMany(Contact::class);
-    }
 }
